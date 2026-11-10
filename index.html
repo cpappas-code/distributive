@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distributive Property Visualizer</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom CSS for Range Slider styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+    input[type=range]:focus {
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 10px;
+      cursor: pointer;
+      background: #cbd5e1;
+      border-radius: 5px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #2563eb;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: transform 0.1s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    
+    /* Segment Theme Color Palette Classes for dynamic binding */
+    .color-section-0 { background-color: #3b82f6; border-color: #1d4ed8; color: #1e40af; } /* Blue */
+    .color-section-1 { background-color: #10b981; border-color: #047857; color: #065f46; } /* Emerald */
+    .color-section-2 { background-color: #f59e0b; border-color: #b45309; color: #92400e; } /* Amber */
+    .color-section-3 { background-color: #ec4899; border-color: #be185d; color: #9d174d; } /* Pink */
+
+    /* Dot item style */
+    .array-dot {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .array-dot:hover {
+      transform: scale(1.25);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
+
+  <!-- Main Container -->
+  <div class="max-w-6xl mx-auto px-4 py-6">
+    
+    <!-- Title Section -->
+    <header class="text-center mb-8">
+      <h1 class="text-3xl md:text-5xl font-extrabold font-heading text-slate-800 tracking-tight flex items-center justify-center gap-3">
+        <i class="fa-solid font-normal text-blue-600 fa-cubes-stacked"></i>
+        Distributive Property Visualizer
+      </h1>
+      <p class="text-slate-600 mt-2 text-sm md:text-base font-medium">
+        Explore how numbers break apart using interactive area models and equations
+      </p>
+    </header>
+
+    <!-- Controls & Equations Top Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+      
+      <!-- TOP LEFT: Input & Algebraic Breakdown -->
+      <div class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+            <h2 class="text-lg font-bold font-heading text-slate-700 flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-blue-500"></i>
+              1. Base Array & Expressions
+            </h2>
+            <button id="reset-btn" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+              <i class="fa-solid fa-rotate-left"></i> Reset Defaults
+            </button>
+          </div>
+
+          <!-- Dimension Inputs -->
+          <div class="flex items-center justify-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200/80 mb-6">
+            <div class="text-center">
+              <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Rows</label>
+              <input type="number" id="rows-input" min="1" max="15" value="5" class="w-16 text-center text-xl font-bold bg-white border-2 border-slate-300 rounded-lg p-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition">
+            </div>
+            
+            <span class="text-2xl font-black text-slate-400 mt-5">&times;</span>
+            
+            <div class="text-center">
+              <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Columns</label>
+              <input type="number" id="cols-input" min="1" max="15" value="7" class="w-16 text-center text-xl font-bold bg-white border-2 border-slate-300 rounded-lg p-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition">
+            </div>
+
+            <div id="total-base-container" class="ml-2 pl-4 border-l border-slate-200 text-left transition-opacity duration-300">
+              <span class="text-xs font-semibold text-slate-400 block uppercase">Total Items</span>
+              <span id="total-base-display" class="text-2xl font-extrabold text-slate-700">35</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Equation Breakdown -->
+          <div class="space-y-4 font-mono text-center md:text-left">
+            <!-- Step 1: Base Expression -->
+            <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 text-lg text-slate-700 font-semibold">
+              <span class="text-xs font-sans font-bold uppercase tracking-wider bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Standard</span>
+              <span id="eq-step1" class="text-xl">5 &times; 7</span>
+            </div>
+
+            <!-- Step 2: Broken Apart Expression -->
+            <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 text-lg text-slate-700 font-semibold">
+              <span class="text-xs font-sans font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Expanded</span>
+              <span id="eq-step2" class="text-xl">5 &times; (5 + 2)</span>
+            </div>
+
+            <!-- Step 3: Distributed Terms -->
+            <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 text-lg font-bold">
+              <span class="text-xs font-sans font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">Distributed</span>
+              <div id="eq-step3" class="flex flex-wrap items-center gap-1 text-xl">
+                <!-- Dynamically Inserted -->
+              </div>
+            </div>
+
+            <!-- Step 4: Partial Products -->
+            <div id="eq-step4-container" class="flex flex-wrap items-center justify-center md:justify-start gap-2 text-lg font-bold">
+              <span class="text-xs font-sans font-bold uppercase tracking-wider bg-purple-100 text-purple-700 px-2 py-0.5 rounded">Products</span>
+              <div id="eq-step4" class="flex flex-wrap items-center gap-1 text-xl">
+                <!-- Dynamically Inserted -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Sum Output Card with Show/Hide Toggle -->
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" id="toggle-product-top" checked class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer">
+            <span class="text-xs font-bold text-slate-600 uppercase">Show Total Answer</span>
+          </label>
+          
+          <div id="total-product-box" class="px-5 py-2 bg-blue-600 text-white rounded-lg text-xl font-bold shadow-sm transition-all duration-300">
+            35
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP RIGHT: Split Breakdown Controls -->
+      <div class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+            <h2 class="text-lg font-bold font-heading text-slate-700 flex items-center gap-2">
+              <i class="fa-solid fa-scissors text-blue-500"></i>
+              2. Splitting Configuration
+            </h2>
+          </div>
+
+          <!-- Dimension Choice (Rows vs Columns) -->
+          <div class="mb-5">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Break Apart Factor:</label>
+            <div class="grid grid-cols-2 gap-3">
+              <button id="break-cols-btn" class="py-2.5 px-4 rounded-xl font-semibold border-2 transition text-sm flex items-center justify-center gap-2 border-blue-600 bg-blue-50 text-blue-700">
+                <i class="fa-solid fa-arrows-left-right"></i> Columns (<span id="btn-cols-val">7</span>)
+              </button>
+              <button id="break-rows-btn" class="py-2.5 px-4 rounded-xl font-semibold border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 transition text-sm flex items-center justify-center gap-2">
+                <i class="fa-solid fa-arrows-up-down"></i> Rows (<span id="btn-rows-val">5</span>)
+              </button>
+            </div>
+          </div>
+
+          <!-- Number of Splits Selection -->
+          <div class="mb-5">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Number of Parts:</label>
+            <div class="flex items-center gap-3">
+              <button data-splits="2" class="split-num-btn flex-1 py-2 rounded-xl font-bold border-2 border-blue-600 bg-blue-600 text-white shadow-sm transition text-center">2 Parts</button>
+              <button data-splits="3" class="split-num-btn flex-1 py-2 rounded-xl font-bold border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 transition text-center">3 Parts</button>
+              <button data-splits="4" class="split-num-btn flex-1 py-2 rounded-xl font-bold border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 transition text-center">4 Parts</button>
+            </div>
+          </div>
+
+          <!-- Partition Sliders Container -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Adjust Partition Cutoff Points</span>
+              <span id="partition-values-badge" class="text-xs font-mono font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                5 + 2
+              </span>
+            </div>
+
+            <!-- Dynamic Sliders List -->
+            <div id="sliders-container" class="space-y-4">
+              <!-- Dynamically generated partition sliders -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Part Breakdown Summary Display -->
+        <div class="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-xs text-slate-500 font-medium">Split Target: <strong id="split-target-text" class="text-slate-800">Columns (7)</strong></span>
+          <span id="split-equation-preview" class="text-sm font-mono font-bold text-blue-600">7 = 5 + 2</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MAIN VISUAL ARRAY SECTION (Bottom Interactive Area Model) -->
+    <main class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+      
+      <!-- Array Header & Global Toggles -->
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-slate-100 mb-6">
+        <div>
+          <h2 class="text-xl font-extrabold font-heading text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-border-all text-blue-600"></i>
+            Visual Array Representation
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Interactive dots color-coded by partitioned sub-arrays</p>
+        </div>
+
+        <!-- Display Toggle Buttons -->
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg cursor-pointer transition select-none">
+            <input type="checkbox" id="toggle-expressions" checked class="rounded text-blue-600 focus:ring-blue-500">
+            <span>Show Expressions</span>
+          </label>
+          
+          <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg cursor-pointer transition select-none">
+            <input type="checkbox" id="toggle-products" checked class="rounded text-blue-600 focus:ring-blue-500">
+            <span>Show Partial Products</span>
+          </label>
+
+          <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg cursor-pointer transition select-none">
+            <input type="checkbox" id="toggle-bottom-total" checked class="rounded text-blue-600 focus:ring-blue-500">
+            <span>Show Total Sum</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Centered Interactive Array Grid Display Container -->
+      <div class="overflow-x-auto pb-4 flex flex-col items-center justify-center">
+        
+        <div class="inline-block relative p-4">
+          
+          <!-- Outer Grid Container with dynamic rows/cols -->
+          <div id="array-visual-grid" class="flex flex-col gap-2 relative">
+            <!-- Dynamically Rendered Grid Dots & Partition Dividers -->
+          </div>
+
+          <!-- Bottom Annotations / Partial Products Summary Line -->
+          <div id="bottom-summary-bar" class="mt-8 pt-4 border-t-2 border-slate-300 flex items-center justify-center gap-4 text-center">
+            <!-- Dynamic Partial Sums & Equations -->
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // --- APP STATE ---
+    const state = {
+      rows: 5,
+      cols: 7,
+      splitDim: 'cols', // 'cols' or 'rows'
+      numSplits: 2,    // 2, 3, or 4
+      cutoffs: [5],     // Partition boundary indices (1-indexed cutoffs)
+      showExpressions: true,
+      showProducts: true,
+      showTotal: true
+    };
+
+    // Color theme hex maps for sections
+    const colors = [
+      { bg: '#3b82f6', lightBg: '#eff6ff', border: '#1d4ed8', text: '#1e40af', badge: 'bg-blue-100 text-blue-800 border-blue-300' },      // Blue
+      { bg: '#10b981', lightBg: '#ecfdf5', border: '#047857', text: '#065f46', badge: 'bg-emerald-100 text-emerald-800 border-emerald-300' }, // Green
+      { bg: '#f59e0b', lightBg: '#fffbeb', border: '#b45309', text: '#92400e', badge: 'bg-amber-100 text-amber-800 border-amber-300' },    // Amber
+      { bg: '#ec4899', lightBg: '#fdf2f8', border: '#be185d', text: '#9d174d', badge: 'bg-pink-100 text-pink-800 border-pink-300' }      // Pink
+    ];
+
+    // --- DOM ELEMENTS ---
+    const rowsInput = document.getElementById('rows-input');
+    const colsInput = document.getElementById('cols-input');
+    const totalBaseDisplay = document.getElementById('total-base-display');
+    const totalBaseContainer = document.getElementById('total-base-container');
+    const resetBtn = document.getElementById('reset-btn');
+
+    const breakColsBtn = document.getElementById('break-cols-btn');
+    const breakRowsBtn = document.getElementById('break-rows-btn');
+    const btnColsVal = document.getElementById('btn-cols-val');
+    const btnRowsVal = document.getElementById('btn-rows-val');
+
+    const splitNumBtns = document.querySelectorAll('.split-num-btn');
+    const slidersContainer = document.getElementById('sliders-container');
+    const partitionValuesBadge = document.getElementById('partition-values-badge');
+    const splitTargetText = document.getElementById('split-target-text');
+    const splitEquationPreview = document.getElementById('split-equation-preview');
+
+    const eqStep1 = document.getElementById('eq-step1');
+    const eqStep2 = document.getElementById('eq-step2');
+    const eqStep3 = document.getElementById('eq-step3');
+    const eqStep4 = document.getElementById('eq-step4');
+    const eqStep4Container = document.getElementById('eq-step4-container');
+
+    const toggleProductTop = document.getElementById('toggle-product-top');
+    const totalProductBox = document.getElementById('total-product-box');
+
+    const toggleExpressions = document.getElementById('toggle-expressions');
+    const toggleProducts = document.getElementById('toggle-products');
+    const toggleBottomTotal = document.getElementById('toggle-bottom-total');
+
+    const arrayVisualGrid = document.getElementById('array-visual-grid');
+    const bottomSummaryBar = document.getElementById('bottom-summary-bar');
+
+    // --- INITIALIZATION & EVENT LISTENERS ---
+    function init() {
+      // Event listeners for basic dimensions
+      rowsInput.addEventListener('input', (e) => {
+        let val = parseInt(e.target.value) || 1;
+        val = Math.max(1, Math.min(15, val));
+        state.rows = val;
+        validateAndNormalizeCutoffs();
+        render();
+      });
+
+      colsInput.addEventListener('input', (e) => {
+        let val = parseInt(e.target.value) || 1;
+        val = Math.max(1, Math.min(15, val));
+        state.cols = val;
+        validateAndNormalizeCutoffs();
+        render();
+      });
+
+      resetBtn.addEventListener('click', () => {
+        state.rows = 5;
+        state.cols = 7;
+        state.splitDim = 'cols';
+        state.numSplits = 2;
+        state.cutoffs = [5];
+        rowsInput.value = 5;
+        colsInput.value = 7;
+        render();
+      });
+
+      // Dimension Choice Toggle
+      breakColsBtn.addEventListener('click', () => {
+        if (state.splitDim !== 'cols') {
+          state.splitDim = 'cols';
+          resetCutoffsDefault();
+          render();
+        }
+      });
+
+      breakRowsBtn.addEventListener('click', () => {
+        if (state.splitDim !== 'rows') {
+          state.splitDim = 'rows';
+          resetCutoffsDefault();
+          render();
+        }
+      });
+
+      // Number of splits choice
+      splitNumBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const splits = parseInt(btn.dataset.splits);
+          if (state.numSplits !== splits) {
+            state.numSplits = splits;
+            resetCutoffsDefault();
+            render();
+          }
+        });
+      });
+
+      // Visibility toggles
+      toggleProductTop.addEventListener('change', (e) => {
+        state.showTotal = e.target.checked;
+        toggleBottomTotal.checked = state.showTotal;
+        renderVisibility();
+      });
+
+      toggleBottomTotal.addEventListener('change', (e) => {
+        state.showTotal = e.target.checked;
+        toggleProductTop.checked = state.showTotal;
+        renderVisibility();
+      });
+
+      toggleExpressions.addEventListener('change', (e) => {
+        state.showExpressions = e.target.checked;
+        renderVisibility();
+      });
+
+      toggleProducts.addEventListener('change', (e) => {
+        state.showProducts = e.target.checked;
+        renderVisibility();
+      });
+
+      // Initial Cutoffs set & render
+      resetCutoffsDefault();
+      render();
+    }
+
+    // Adjust cutoffs when switching split number or dimensions
+    function resetCutoffsDefault() {
+      const maxVal = state.splitDim === 'cols' ? state.cols : state.rows;
+      state.cutoffs = [];
+      const step = maxVal / state.numSplits;
+      
+      for (let i = 1; i < state.numSplits; i++) {
+        let val = Math.round(i * step);
+        // Ensure strictly increasing integers within bounds
+        if (val <= (state.cutoffs[i - 2] || 0)) {
+          val = (state.cutoffs[i - 2] || 0) + 1;
+        }
+        val = Math.min(val, maxVal - (state.numSplits - i));
+        state.cutoffs.push(Math.max(1, val));
+      }
+    }
+
+    // Ensure cutoffs stay valid when dimension max decreases
+    function validateAndNormalizeCutoffs() {
+      const maxVal = state.splitDim === 'cols' ? state.cols : state.rows;
+      
+      // If dimension is smaller than required splits, clamp splits
+      if (maxVal < state.numSplits) {
+        state.numSplits = Math.max(2, maxVal);
+      }
+
+      let current = 0;
+      for (let i = 0; i < state.cutoffs.length; i++) {
+        const minAllowed = current + 1;
+        const maxAllowed = maxVal - (state.numSplits - 1 - i);
+        state.cutoffs[i] = Math.max(minAllowed, Math.min(maxAllowed, state.cutoffs[i]));
+        current = state.cutoffs[i];
+      }
+    }
+
+    // Helper: Compute partition segment sizes from cutoffs
+    function getSegmentSizes() {
+      const maxVal = state.splitDim === 'cols' ? state.cols : state.rows;
+      const parts = [];
+      let prev = 0;
+      for (let i = 0; i < state.cutoffs.length; i++) {
+        parts.push(state.cutoffs[i] - prev);
+        prev = state.cutoffs[i];
+      }
+      parts.push(maxVal - prev);
+      return parts;
+    }
+
+    // RENDER CONTROLLER
+    function render() {
+      btnColsVal.textContent = state.cols;
+      btnRowsVal.textContent = state.rows;
+      totalBaseDisplay.textContent = state.rows * state.cols;
+
+      renderSplitButtons();
+      renderSliders();
+      renderEquations();
+      renderVisualArray();
+      renderVisibility();
+    }
+
+    // Render active state of split buttons (Cols vs Rows & Split counts)
+    function renderSplitButtons() {
+      if (state.splitDim === 'cols') {
+        breakColsBtn.className = 'py-2.5 px-4 rounded-xl font-semibold border-2 transition text-sm flex items-center justify-center gap-2 border-blue-600 bg-blue-50 text-blue-700 shadow-sm';
+        breakRowsBtn.className = 'py-2.5 px-4 rounded-xl font-semibold border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 transition text-sm flex items-center justify-center gap-2';
+        splitTargetText.textContent = `Columns (${state.cols})`;
+      } else {
+        breakRowsBtn.className = 'py-2.5 px-4 rounded-xl font-semibold border-2 transition text-sm flex items-center justify-center gap-2 border-blue-600 bg-blue-50 text-blue-700 shadow-sm';
+        breakColsBtn.className = 'py-2.5 px-4 rounded-xl font-semibold border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 transition text-sm flex items-center justify-center gap-2';
+        splitTargetText.textContent = `Rows (${state.rows})`;
+      }
+
+      splitNumBtns.forEach(btn => {
+        const splits = parseInt(btn.dataset.splits);
+        const maxAllowed = state.splitDim === 'cols' ? state.cols : state.rows;
+        
+        if (splits > maxAllowed) {
+          btn.disabled = true;
+          btn.className = 'split-num-btn flex-1 py-2 rounded-xl font-bold border-2 border-slate-100 bg-slate-100 text-slate-300 cursor-not-allowed text-center';
+        } else if (splits === state.numSplits) {
+          btn.disabled = false;
+          btn.className = 'split-num-btn flex-1 py-2 rounded-xl font-bold border-2 border-blue-600 bg-blue-600 text-white shadow-sm transition text-center';
+        } else {
+          btn.disabled = false;
+          btn.className = 'split-num-btn flex-1 py-2 rounded-xl font-bold border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 transition text-center';
+        }
+      });
+    }
+
+    // Dynamic Slider Controls Generation
+    function renderSliders() {
+      slidersContainer.innerHTML = '';
+      const maxVal = state.splitDim === 'cols' ? state.cols : state.rows;
+      const segmentSizes = getSegmentSizes();
+
+      partitionValuesBadge.textContent = segmentSizes.join(' + ');
+      splitEquationPreview.textContent = `${maxVal} = ${segmentSizes.join(' + ')}`;
+
+      for (let i = 0; i < state.numSplits - 1; i++) {
+        const sliderWrapper = document.createElement('div');
+        sliderWrapper.className = 'flex flex-col gap-1';
+
+        const minVal = i === 0 ? 1 : state.cutoffs[i - 1] + 1;
+        const maxAllowed = maxVal - (state.numSplits - 1 - i);
+
+        const labelRow = document.createElement('div');
+        labelRow.className = 'flex justify-between items-center text-xs font-semibold text-slate-600';
+        labelRow.innerHTML = `
+          <span>Split ${i + 1} Cutoff (After unit ${state.cutoffs[i]})</span>
+          <span class="font-mono text-blue-600 font-bold">${state.cutoffs[i]}</span>
+        `;
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = minVal;
+        slider.max = maxAllowed;
+        slider.value = state.cutoffs[i];
+
+        slider.addEventListener('input', (e) => {
+          state.cutoffs[i] = parseInt(e.target.value);
+          // Adjust subsequent cutoffs if pushed
+          for (let j = i + 1; j < state.cutoffs.length; j++) {
+            if (state.cutoffs[j] <= state.cutoffs[j - 1]) {
+              state.cutoffs[j] = state.cutoffs[j - 1] + 1;
+            }
+          }
+          render();
+        });
+
+        sliderWrapper.appendChild(labelRow);
+        sliderWrapper.appendChild(slider);
+        slidersContainer.appendChild(sliderWrapper);
+      }
+    }
+
+    // Render Equations Step by Step
+    function renderEquations() {
+      const parts = getSegmentSizes();
+      const fixedDim = state.splitDim === 'cols' ? state.rows : state.cols;
+
+      // Step 1: Base Equation (e.g. 5 x 7)
+      eqStep1.textContent = `${state.rows} \u00D7 ${state.cols}`;
+
+      // Step 2: Grouped Expansion (e.g. 5 x (5 + 2) or (3 + 2) x 7)
+      if (state.splitDim === 'cols') {
+        eqStep2.textContent = `${state.rows} \u00D7 (${parts.join(' + ')})`;
+      } else {
+        eqStep2.textContent = `(${parts.join(' + ')}) \u00D7 ${state.cols}`;
+      }
+
+      // Step 3: Expanded Distributive Terms with Color Badges
+      eqStep3.innerHTML = '';
+      parts.forEach((part, idx) => {
+        if (idx > 0) {
+          const plusSpan = document.createElement('span');
+          plusSpan.className = 'text-slate-400 font-bold mx-1';
+          plusSpan.textContent = '+';
+          eqStep3.appendChild(plusSpan);
+        }
+
+        const termSpan = document.createElement('span');
+        const color = colors[idx % colors.length];
+        termSpan.className = `px-2 py-0.5 rounded-md border text-sm md:text-base font-bold ${color.badge}`;
+        
+        if (state.splitDim === 'cols') {
+          termSpan.textContent = `(${fixedDim} \u00D7 ${part})`;
+        } else {
+          termSpan.textContent = `(${part} \u00D7 ${fixedDim})`;
+        }
+        eqStep3.appendChild(termSpan);
+      });
+
+      // Step 4: Partial Products (e.g. 25 + 10)
+      eqStep4.innerHTML = '';
+      parts.forEach((part, idx) => {
+        if (idx > 0) {
+          const plusSpan = document.createElement('span');
+          plusSpan.className = 'text-slate-400 font-bold mx-1';
+          plusSpan.textContent = '+';
+          eqStep4.appendChild(plusSpan);
+        }
+
+        const prodSpan = document.createElement('span');
+        const color = colors[idx % colors.length];
+        const val = fixedDim * part;
+        prodSpan.className = `px-2 py-0.5 rounded-md text-sm md:text-base font-bold font-mono ${color.badge}`;
+        prodSpan.textContent = val;
+        eqStep4.appendChild(prodSpan);
+      });
+
+      // Total Product Result
+      totalProductBox.textContent = state.rows * state.cols;
+    }
+
+    // Helper: Determine section index for dot (r, c)
+    function getSectionIndex(r, c) {
+      const parts = getSegmentSizes();
+      let accumulated = 0;
+      const targetIndex = state.splitDim === 'cols' ? c : r;
+
+      for (let i = 0; i < parts.length; i++) {
+        accumulated += parts[i];
+        if (targetIndex < accumulated) {
+          return i;
+        }
+      }
+      return parts.length - 1;
+    }
+
+    // Render Main Visual Array Grid & Section Annotations
+    function renderVisualArray() {
+      arrayVisualGrid.innerHTML = '';
+      bottomSummaryBar.innerHTML = '';
+
+      const parts = getSegmentSizes();
+      const fixedDim = state.splitDim === 'cols' ? state.rows : state.cols;
+
+      // Grid Layout Structure
+      for (let r = 0; r < state.rows; r++) {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'flex items-center gap-2 relative';
+
+        for (let c = 0; c < state.cols; c++) {
+          const sectionIdx = getSectionIndex(r, c);
+          const color = colors[sectionIdx % colors.length];
+
+          // Check if this dot sits right before a column partition divider
+          const isColDividerAfter = state.splitDim === 'cols' && state.cutoffs.includes(c + 1);
+
+          const dot = document.createElement('div');
+          dot.className = 'array-dot w-6 h-6 md:w-8 md:h-8 rounded-full border-2 flex items-center justify-center shadow-sm cursor-pointer transition-transform';
+          dot.style.backgroundColor = color.bg;
+          dot.style.borderColor = color.border;
+
+          // Tooltip hint on hover
+          dot.title = `Row ${r + 1}, Column ${c + 1} (Part ${sectionIdx + 1})`;
+
+          rowDiv.appendChild(dot);
+
+          // Add Vertical Partition Line Divider if splitting columns
+          if (isColDividerAfter) {
+            const divider = document.createElement('div');
+            divider.className = 'w-1 self-stretch bg-slate-800 rounded-full my-0.5 opacity-80 z-10';
+            rowDiv.appendChild(divider);
+          }
+        }
+
+        arrayVisualGrid.appendChild(rowDiv);
+
+        // Add Horizontal Partition Line Divider if splitting rows
+        if (state.splitDim === 'rows' && state.cutoffs.includes(r + 1)) {
+          const hDivider = document.createElement('div');
+          hDivider.className = 'h-1 w-full bg-slate-800 rounded-full my-0.5 opacity-80 z-10';
+          arrayVisualGrid.appendChild(hDivider);
+        }
+      }
+
+      // Render Sub-array Annotation Cards beneath/alongside the array
+      parts.forEach((part, idx) => {
+        const color = colors[idx % colors.length];
+        const partialProd = fixedDim * part;
+
+        if (idx > 0) {
+          const plusSign = document.createElement('div');
+          plusSign.className = 'text-2xl font-black text-slate-400 font-mono';
+          plusSign.textContent = '+';
+          bottomSummaryBar.appendChild(plusSign);
+        }
+
+        const partCard = document.createElement('div');
+        partCard.className = 'flex flex-col items-center p-3 rounded-xl border-2 transition-all shadow-sm min-w-[90px]';
+        partCard.style.backgroundColor = color.lightBg;
+        partCard.style.borderColor = color.border;
+
+        const exprText = state.splitDim === 'cols' 
+          ? `${state.rows} \u00D7 ${part}` 
+          : `${part} \u00D7 ${state.cols}`;
+
+        partCard.innerHTML = `
+          <div class="part-expression text-sm md:text-base font-extrabold font-mono" style="color: ${color.text}">${exprText}</div>
+          <div class="part-product text-xl md:text-2xl font-black font-mono mt-1" style="color: ${color.text}">${partialProd}</div>
+        `;
+
+        bottomSummaryBar.appendChild(partCard);
+      });
+
+      // Total Sum Equality Footer Annotation
+      const equalSign = document.createElement('div');
+      equalSign.className = 'part-total text-2xl font-black text-slate-400 font-mono';
+      equalSign.textContent = '=';
+      bottomSummaryBar.appendChild(equalSign);
+
+      const totalCard = document.createElement('div');
+      totalCard.className = 'part-total flex flex-col items-center px-4 py-3 rounded-xl bg-slate-800 text-white font-mono shadow-md';
+      totalCard.innerHTML = `
+        <span class="text-xs uppercase font-sans font-bold text-slate-300">Total Sum</span>
+        <span class="text-xl md:text-2xl font-black">${state.rows * state.cols}</span>
+      `;
+      bottomSummaryBar.appendChild(totalCard);
+    }
+
+    // Toggle Element Visibilities based on state flags
+    function renderVisibility() {
+      // Top step 4 visibility
+      if (state.showProducts) {
+        eqStep4Container.style.display = 'flex';
+      } else {
+        eqStep4Container.style.display = 'none';
+      }
+
+      // Top total box and total items display visibility
+      if (state.showTotal) {
+        totalProductBox.style.opacity = '1';
+        totalProductBox.style.visibility = 'visible';
+        totalBaseContainer.style.opacity = '1';
+        totalBaseContainer.style.visibility = 'visible';
+      } else {
+        totalProductBox.style.opacity = '0';
+        totalProductBox.style.visibility = 'hidden';
+        totalBaseContainer.style.opacity = '0';
+        totalBaseContainer.style.visibility = 'hidden';
+      }
+
+      // Bottom Expressions
+      document.querySelectorAll('.part-expression').forEach(el => {
+        el.style.display = state.showExpressions ? 'block' : 'none';
+      });
+
+      // Bottom Products
+      document.querySelectorAll('.part-product').forEach(el => {
+        el.style.display = state.showProducts ? 'block' : 'none';
+      });
+
+      // Bottom Total
+      document.querySelectorAll('.part-total').forEach(el => {
+        el.style.display = state.showTotal ? 'flex' : 'none';
+      });
+    }
+
+    // Run on startup
+    window.onload = init;
+  </script>
+</body>
+</html>
